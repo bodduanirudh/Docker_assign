@@ -9,9 +9,15 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
       - run: pip install --upgrade pip
-      - python/install-packages:
-          pkg-manager: pip
+      - run: pip install -r requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
       - run:
           name: Run tests
           command: pytest test.py
@@ -42,4 +48,4 @@ workflows:
           filters:
             branches:
               only:
-                - main  # Replace with your default branch if it's not 'main'
+                - main  # This ensures the job only runs on the main branch.
