@@ -1,0 +1,39 @@
+version: 2.1
+orbs:
+  python: circleci/python@1.2.0
+  docker: circleci/docker@2.1.1
+
+jobs:
+  build_and_test:
+    docker:
+      - image: cimg/python:3.9  # Use an image close to your dev environment
+    steps:
+      - checkout
+      - python/load-cache  # Restore cache
+      - run: pip install -r requirements.txt  # Install dependencies
+      - run: pytest test.py  # Run tests
+      - python/save-cache  # Save cache
+
+  build_and_push_image:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - run:
+          name: "Build Docker Image"
+          command: |
+            docker build -t yourdockerhubusername/yourappname:latest .
+      - docker/publish:
+          image: yourdockerhubusername/yourappname
+          tag: latest
+          username: $DOCKER_HUB_USERNAME
+          password: $DOCKER_HUB_ACCESS_TOKEN
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build_and_test
+      - build_and_push_image:
+          requires:
+            - build_and_test
