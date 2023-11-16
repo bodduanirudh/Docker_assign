@@ -6,21 +6,20 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: cimg/python:3.9  # Update this line to match the Python version you use
+      - image: cimg/python:3.9  # Ensure this matches the version you need
     steps:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          # Here you can specify a custom directory for your requirements.txt if it's not in the root.
-          # For example: app-dir: ~/project/subfolder/
+          # If your requirements.txt is not in the root, specify the directory it is in:
+          app-dir: ~/project/subdirectory/  # Update this line with the correct path
+          # If your requirements file is named differently, specify the file name:
+          pip-dependency-file: subdirectory/requirements.txt  # Update this line with the correct path
       - run:
           name: Run tests
           command: |
-            # If you need to perform additional steps before running pytest, add them here.
-            # For example, if you need to install other dependencies or set up your environment.
-            # pip install some-other-dependency
-            # python some-setup-script.py
-            pytest test.py  # Specify the path to your tests if they're not in the root directory
+            # Adjust the path to pytest if necessary
+            pytest ./subdirectory/test.py  # Update this line with the correct path to your test script
 
 workflows:
   sample:
