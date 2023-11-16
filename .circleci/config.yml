@@ -9,12 +9,14 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - checkout
-      - run: sudo pip install --upgrade pip  # Upgrade pip to the latest version
-      - python/install-packages:  # This will automatically use requirements.txt in the root
+      - run:
+          name: Upgrade pip
+          command: pip install --upgrade pip
+      - python/install-packages:
           pkg-manager: pip
       - run:
           name: Run tests
-          command: pytest test.py  # Your test script is also in the root directory
+          command: pytest test.py
 
 workflows:
   sample:
