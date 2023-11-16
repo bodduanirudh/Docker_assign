@@ -9,16 +9,37 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - checkout
-      - run:
-          name: Upgrade pip
-          command: pip install --upgrade pip
+      - run: pip install --upgrade pip
       - python/install-packages:
           pkg-manager: pip
       - run:
           name: Run tests
           command: pytest test.py
 
+  build-and-push:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $DOCKER_HUB_USERNAME/myapp:${CIRCLE_SHA1} .
+      - run:
+          name: Push Docker Image
+          command: |
+            echo $DOCKER_HUB_ACCESS_TOKEN | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+            docker push $DOCKER_HUB_USERNAME/myapp:${CIRCLE_SHA1}
+
 workflows:
-  sample:
+  build-deploy:
     jobs:
       - build-and-test
+      - build-and-push:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - main  # Replace with your default branch if it's not 'main'
