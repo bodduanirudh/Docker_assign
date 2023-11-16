@@ -29,18 +29,21 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Check Docker Hub Username
+          command: |
+            if [ -z "$DOCKER_HUB_USERNAME" ]; then
+              echo "DOCKER_HUB_USERNAME is not set. Exiting..."
+              exit 1
+            fi
+      - run:
           name: Build Docker Image
           command: |
             docker build -t $DOCKER_HUB_USERNAME/myapp:${CIRCLE_SHA1} .
       - run:
-    name: Build Docker Image
-    command: |
-      if [ -z "$DOCKER_HUB_USERNAME" ]; then
-        echo "DOCKER_HUB_USERNAME is not set. Exiting..."
-        exit 1
-      fi
-      docker build -t $DOCKER_HUB_USERNAME/myapp:${CIRCLE_SHA1} .
-
+          name: Push Docker Image
+          command: |
+            echo $DOCKER_HUB_ACCESS_TOKEN | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+            docker push $DOCKER_HUB_USERNAME/myapp:${CIRCLE_SHA1}
 
 workflows:
   build-deploy:
