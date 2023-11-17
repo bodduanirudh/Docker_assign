@@ -54,7 +54,7 @@ jobs:
           name: Build Docker Image
           command: |
             TAG=0.1.${CIRCLE_BUILD_NUM}
-            docker buildx build -t $DOCKER_HUB_USERNAME/myapp:$TAG -f docker/Dockerfile .
+            docker buildx build -t $DOCKER_HUB_USERNAME/ci_dockerimage:$TAG -f docker/Dockerfile .
 
       - save_cache:
            paths:
@@ -76,7 +76,7 @@ jobs:
           name: Push Docker Image
           command: |
             echo $DOCKER_HUB_ACCESS_TOKEN | docker login --username $DOCKER_HUB_USERNAME --password-stdin
-            docker push $DOCKER_HUB_USERNAME/myapp:$TAG
+            docker push $DOCKER_HUB_USERNAME/ci_dockerimage:$TAG
 
 workflows:
   build-deploy:
